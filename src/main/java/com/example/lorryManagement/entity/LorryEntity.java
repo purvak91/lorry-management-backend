@@ -1,4 +1,4 @@
-package com.example.lorryManagement;
+package com.example.lorryManagement.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
