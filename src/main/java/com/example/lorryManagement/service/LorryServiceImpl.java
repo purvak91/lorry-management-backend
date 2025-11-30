@@ -4,6 +4,8 @@ import com.example.lorryManagement.entity.LorryEntity;
 import com.example.lorryManagement.repository.LorryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,8 +35,8 @@ public class LorryServiceImpl implements LorryService {
     }
 
     @Override
-    public List<LorryEntity> findAll() {
-        return lorryRepository.findAll();
+    public Page<LorryEntity> findAll(Pageable pageable) {
+        return lorryRepository.findAll(pageable);
     }
 
     @Override
@@ -91,22 +93,22 @@ public class LorryServiceImpl implements LorryService {
     }
 
     @Override
-    public List<LorryEntity> findByDate(LocalDate date) {
-        return lorryRepository.findByDate(date);
+    public Page<LorryEntity> findByDate(LocalDate date, Pageable pageable) {
+        return lorryRepository.findByDate(date, pageable);
     }
 
     @Override
-    public List<LorryEntity> findByLorryNumber(String lorryNumber) {
-        return lorryRepository.findByLorryNumber(lorryNumber);
+    public Page<LorryEntity> findByLorryNumber(String lorryNumber,Pageable pageable) {
+        return lorryRepository.findByLorryNumber(lorryNumber, pageable);
     }
 
     @Override
-    public List<LorryEntity> findByConsignorName(String consignorName) {
-        return lorryRepository.findByConsignorName(consignorName);
+    public Page<LorryEntity> findByConsignorName(String consignorName, Pageable pageable) {
+        return lorryRepository.findByConsignorName(consignorName, pageable);
     }
 
     @Override
-    public List<LorryEntity> findByDateRange(LocalDate start, LocalDate end) {
-        return lorryRepository.findAllByDateBetween(start, end);
+    public Page<LorryEntity> findByDateRange(LocalDate start, LocalDate end, Pageable pageable) {
+        return lorryRepository.findAllByDateBetween(start, end, pageable);
     }
 }

@@ -1,17 +1,18 @@
 package com.example.lorryManagement.repository;
 
 import com.example.lorryManagement.entity.LorryEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Repository
 public interface LorryRepository extends JpaRepository<LorryEntity, Long> {
-    public List<LorryEntity> findByDate(LocalDate date);
-    public List<LorryEntity> findByLorryNumber(String lorryNumber);
-    public List<LorryEntity> findByConsignorName(String consignorName);
-    public List<LorryEntity> findAllByDateBetween(LocalDate start, LocalDate end);
+    Page<LorryEntity> findByDate(LocalDate date, Pageable pageable);
+    Page<LorryEntity> findByLorryNumber(String lorryNumber, Pageable pageable);
+    Page<LorryEntity> findByConsignorName(String consignorName, Pageable pageable);
+    Page<LorryEntity> findAllByDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
 }

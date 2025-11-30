@@ -1,19 +1,21 @@
 package com.example.lorryManagement.service;
 
 import com.example.lorryManagement.entity.LorryEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface LorryService {
-    public LorryEntity save(LorryEntity lorryEntity);
-    public Optional<LorryEntity> findByLr(Long lr);
-    public List<LorryEntity> findAll();
-    public void deleteByLr(Long lr);
-    public LorryEntity update(LorryEntity lorryEntity);
-    public List<LorryEntity> findByDate(LocalDate date);
-    public List<LorryEntity> findByLorryNumber(String lorryNumber);
-    public List<LorryEntity> findByConsignorName(String consignorName);
-    public List<LorryEntity> findByDateRange(LocalDate start, LocalDate end);
+    Page<LorryEntity> findAll(Pageable pageable);
+    LorryEntity save(LorryEntity lorryEntity);
+    Optional<LorryEntity> findByLr(Long lr);
+    void deleteByLr(Long lr);
+    LorryEntity update(LorryEntity lorryEntity);
+    Page<LorryEntity> findByDate(LocalDate date, Pageable pageable);
+    Page<LorryEntity> findByLorryNumber(String lorryNumber, Pageable pageable);
+    Page<LorryEntity> findByConsignorName(String consignorName,  Pageable pageable);
+    Page<LorryEntity> findByDateRange(LocalDate start, LocalDate end,  Pageable pageable);
 }
