@@ -3,6 +3,7 @@ package com.example.lorryManagement.service;
 import com.example.lorryManagement.entity.LorryEntity;
 import com.example.lorryManagement.repository.LorryRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,6 +21,9 @@ public class LorryServiceImpl implements LorryService {
 
     @Override
     public LorryEntity save(LorryEntity lorryEntity) {
+        if (lorryRepository.existsById(lorryEntity.getLr())) {
+            throw new DuplicateKeyException("LR" + lorryEntity.getLr() + " already exists");
+        }
         return lorryRepository.save(lorryEntity);
     }
 
