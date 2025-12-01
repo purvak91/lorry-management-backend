@@ -41,8 +41,12 @@ public class LorryServiceImpl implements LorryService {
 
     @Override
     public void deleteByLr(Long lr) {
+        if (!lorryRepository.existsById(lr)) {
+            throw new NoSuchElementException("LR not found: " + lr);
+        }
         lorryRepository.deleteById(lr);
     }
+
 
     @Override
     @Transactional
