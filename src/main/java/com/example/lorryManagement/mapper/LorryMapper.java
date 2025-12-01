@@ -5,7 +5,7 @@ import com.example.lorryManagement.dtos.LorryResponseDto;
 import com.example.lorryManagement.entity.LorryEntity;
 
 public final class LorryMapper {
-    private LorryMapper() {
+    public LorryMapper() {
 
     }
     public static LorryEntity toEntity(LorryRequestDto dto) {
