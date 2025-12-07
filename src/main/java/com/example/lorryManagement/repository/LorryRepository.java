@@ -4,6 +4,7 @@ import com.example.lorryManagement.entity.LorryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -15,4 +16,6 @@ public interface LorryRepository extends JpaRepository<LorryEntity, Long> {
     Page<LorryEntity> findByConsignorName(String consignorName, Pageable pageable);
     Page<LorryEntity> findAllByDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
+    @Query("SELECT COALESCE(MAX(l.lr), 0) FROM  lorry l")
+    Long findMaxLr();
 }

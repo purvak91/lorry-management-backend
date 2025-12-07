@@ -47,7 +47,6 @@ public class LorryServiceImpl implements LorryService {
         lorryRepository.deleteById(lr);
     }
 
-
     @Override
     @Transactional
     public LorryEntity update(LorryEntity lorryEntity) {
@@ -114,5 +113,11 @@ public class LorryServiceImpl implements LorryService {
     @Override
     public Page<LorryEntity> findByDateRange(LocalDate start, LocalDate end, Pageable pageable) {
         return lorryRepository.findAllByDateBetween(start, end, pageable);
+    }
+
+    @Override
+    public Long getNextLr() {
+        Long maxLr = lorryRepository.findMaxLr();
+        return maxLr + 1;
     }
 }

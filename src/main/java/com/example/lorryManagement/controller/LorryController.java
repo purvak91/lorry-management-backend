@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -138,5 +136,11 @@ public class LorryController {
     public ResponseEntity<Void> deleteLorry(@PathVariable Long lr) {
         lorryService.deleteByLr(lr);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/next-lr")
+    public Map<String, Long> getNextLr() {
+        Long nextLr = lorryService.getNextLr();
+        return Collections.singletonMap("lr", nextLr);
     }
 }

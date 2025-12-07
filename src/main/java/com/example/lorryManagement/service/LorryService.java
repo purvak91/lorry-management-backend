@@ -18,4 +18,6 @@ public interface LorryService {
     Page<LorryEntity> findByLorryNumber(String lorryNumber, Pageable pageable);
     Page<LorryEntity> findByConsignorName(String consignorName,  Pageable pageable);
     Page<LorryEntity> findByDateRange(LocalDate start, LocalDate end,  Pageable pageable);
+
+    Long getNextLr();
 }
