@@ -270,9 +270,11 @@ public class LorryServiceImplTest {
 
     @Test
     void deleteByLr_shouldCallRepositoryDeleteById() {
-        lorryService.deleteByLr(1111L);
-        verify(lorryRepository).deleteById(1111L);
-    }
+        Long lr = 1111L;
+        when(lorryRepository.existsById(lr)).thenReturn(true);
 
+        lorryService.deleteByLr(lr);
+        verify(lorryRepository).deleteById(lr);
+    }
 
 }
