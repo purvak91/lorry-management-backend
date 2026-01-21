@@ -2,10 +2,12 @@ package com.example.lorryManagement.service;
 
 import com.example.lorryManagement.entity.LorryEntity;
 import com.example.lorryManagement.repository.LorryRepository;
+import com.example.lorryManagement.specification.LorrySpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ public class LorryServiceImpl implements LorryService {
         if (lorryRepository.existsById(lorryEntity.getLr())) {
             throw new DuplicateKeyException("LR" + lorryEntity.getLr() + " already exists");
         }
+        normalize(lorryEntity);
         return lorryRepository.save(lorryEntity);
     }
 
@@ -62,6 +65,7 @@ public class LorryServiceImpl implements LorryService {
 
         // if everything is well then we move to actually update the code
 
+        normalize(lorryEntity);
         LorryEntity existing =  lorry.get();
 
         if (lorryEntity.getLorryNumber() != null) {
@@ -119,5 +123,54 @@ public class LorryServiceImpl implements LorryService {
     public Long getNextLr() {
         Long maxLr = lorryRepository.findMaxLr();
         return maxLr + 1;
+    }
+
+    @Override
+    public Page<LorryEntity> findWithFilters(
+            String lorryNumber,
+            LocalDate date,
+            LocalDate from,
+            LocalDate to,
+            Pageable pageable
+    ) {
+        Specification<LorryEntity> spec =
+                Specification
+                        .where(LorrySpecification.hasLorryNumber(lorryNumber))
+                        .and(LorrySpecification.hasDate(date))
+                        .and(LorrySpecification.hasDateBetween(from, to));
+
+        return lorryRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public List<String> getDistinctLorryNumbers() {
+        return lorryRepository.findDistinctLorryNumbers();
+    }
+
+    @Override
+    public List<String> getDistinctFromLocations() {
+        return lorryRepository.findDistinctFromLocations();
+    }
+
+    @Override
+    public List<String> getDistinctToLocations() {
+        return lorryRepository.findDistinctToLocations();
+    }
+
+    @Override
+    public List<String> getDistinctConsignorNames() {
+        return lorryRepository.findDistinctConsignorNames();
+    }
+
+    private void normalize(LorryEntity l) {
+        if (l.getFromLocation() != null) {
+            l.setFromLocation(l.getFromLocation().trim().toUpperCase());
+        }
+        if (l.getToLocation() != null) {
+            l.setToLocation(l.getToLocation().trim().toUpperCase());
+        }
+        if (l.getConsignorName() != null) {
+            l.setConsignorName(l.getConsignorName().trim());
+        }
     }
 }
