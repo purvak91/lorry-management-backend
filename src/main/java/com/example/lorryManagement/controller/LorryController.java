@@ -10,8 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,10 +54,7 @@ public class LorryController {
     @GetMapping("/{lr}")
     public ResponseEntity<LorryResponseDto> getLorry(@PathVariable("lr") Long lr) {
         Optional<LorryEntity> entity = lorryService.findByLr(lr);
-        if (entity.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(LorryMapper.toDto(entity.get()));
+        return entity.map(lorryEntity -> ResponseEntity.ok(LorryMapper.toDto(lorryEntity))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(
@@ -64,34 +62,38 @@ public class LorryController {
             description = """
                 Returns a paginated list of LR records.
                 You can filter by:
-                - exact date (date)
-                - lorry number (lorryNumber)
+                - search term (search) matching LR number, consignor name, from/to locations, or lorry number
                 - date range (fromDate / toDate)
-                If no filters are provided, all LR entries are returned paginated.
+                If no filters are provided, all LR entries are returned paginated and sorted in descending order.
                 """
     )
+    /*
+     * API contract:
+     * - Server-side pagination & filtering only
+     * - Supported filters: search, from, to
+     * - Sorting defaults to lr DESC
+     * - Client must NOT apply local filtering
+     */
     @GetMapping
     public ResponseEntity<Page<LorryResponseDto>> getAllLorries(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) String lorryNumber,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @PageableDefault(sort = "lr", direction = Sort.Direction.DESC)
             Pageable pageable) {
 
         Page<LorryEntity> page = lorryService.findWithFilters(
-                lorryNumber,
-                date,
+                search,
                 from,
                 to,
                 pageable
         );
 
         // mapping entities
-        List<LorryResponseDto> dtos = page.getContent().stream().map(LorryMapper::toDto).toList();
+        Page<LorryResponseDto> dtoPage =
+                page.map(LorryMapper::toDto);
 
-        Page<LorryResponseDto> dtoPage = new PageImpl<>(dtos, pageable, page.getTotalElements());
-
-        return  ResponseEntity.ok(dtoPage);
+        return ResponseEntity.ok(dtoPage);
     }
 
     @Operation(

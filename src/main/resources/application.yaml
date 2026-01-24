@@ -14,4 +14,5 @@ spring:
     show-sql: true
 
   flyway:
+    repair-on-migrate: true
     enabled: true

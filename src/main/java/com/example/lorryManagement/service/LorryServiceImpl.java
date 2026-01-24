@@ -38,11 +38,6 @@ public class LorryServiceImpl implements LorryService {
     }
 
     @Override
-    public Page<LorryEntity> findAll(Pageable pageable) {
-        return lorryRepository.findAll(pageable);
-    }
-
-    @Override
     public void deleteByLr(Long lr) {
         if (!lorryRepository.existsById(lr)) {
             throw new NoSuchElementException("LR not found: " + lr);
@@ -100,26 +95,6 @@ public class LorryServiceImpl implements LorryService {
     }
 
     @Override
-    public Page<LorryEntity> findByDate(LocalDate date, Pageable pageable) {
-        return lorryRepository.findByDate(date, pageable);
-    }
-
-    @Override
-    public Page<LorryEntity> findByLorryNumber(String lorryNumber,Pageable pageable) {
-        return lorryRepository.findByLorryNumber(lorryNumber, pageable);
-    }
-
-    @Override
-    public Page<LorryEntity> findByConsignorName(String consignorName, Pageable pageable) {
-        return lorryRepository.findByConsignorName(consignorName, pageable);
-    }
-
-    @Override
-    public Page<LorryEntity> findByDateRange(LocalDate start, LocalDate end, Pageable pageable) {
-        return lorryRepository.findAllByDateBetween(start, end, pageable);
-    }
-
-    @Override
     public Long getNextLr() {
         Long maxLr = lorryRepository.findMaxLr();
         return maxLr + 1;
@@ -127,16 +102,14 @@ public class LorryServiceImpl implements LorryService {
 
     @Override
     public Page<LorryEntity> findWithFilters(
-            String lorryNumber,
-            LocalDate date,
+            String search,
             LocalDate from,
             LocalDate to,
             Pageable pageable
     ) {
         Specification<LorryEntity> spec =
                 Specification
-                        .where(LorrySpecification.hasLorryNumber(lorryNumber))
-                        .and(LorrySpecification.hasDate(date))
+                        .where(LorrySpecification.hasSearch(search))
                         .and(LorrySpecification.hasDateBetween(from, to));
 
         return lorryRepository.findAll(spec, pageable);
