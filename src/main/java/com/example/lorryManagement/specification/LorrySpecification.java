@@ -33,6 +33,9 @@ public class LorrySpecification {
                 return null;
             }
             if (from != null && to != null) {
+                if (from.isAfter(to)) {
+                    throw new IllegalArgumentException("From date cannot be after To date");
+                }
                 return cb.between(root.get("date"), from, to);
             }
             if (from != null) {
