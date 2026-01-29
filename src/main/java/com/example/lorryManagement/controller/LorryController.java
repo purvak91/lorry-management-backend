@@ -1,17 +1,19 @@
 package com.example.lorryManagement.controller;
 
+import com.example.lorryManagement.config.PaginationConfig;
 import com.example.lorryManagement.dtos.LorryRequestDto;
 import com.example.lorryManagement.dtos.LorryResponseDto;
 import com.example.lorryManagement.entity.LorryEntity;
+import com.example.lorryManagement.exception.BadRequestException;
 import com.example.lorryManagement.mapper.LorryMapper;
 import com.example.lorryManagement.service.LorryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,10 +81,27 @@ public class LorryController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @PageableDefault(sort = "lr", direction = Sort.Direction.DESC)
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws BadRequestException {
 
-        Page<LorryEntity> page = lorryService.findWithFilters(
+        if (page < 0) {
+            throw new BadRequestException("Page index must be >= 0");
+        }
+
+        if (size < 1 || size > PaginationConfig.MAX_PAGE_SIZE) {
+            throw new BadRequestException(
+                    "Page size must be between 1 and " + PaginationConfig.MAX_PAGE_SIZE
+            );
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "lr")
+        );
+
+
+        Page<LorryEntity> result = lorryService.findWithFilters(
                 search,
                 from,
                 to,
@@ -91,7 +110,7 @@ public class LorryController {
 
         // mapping entities
         Page<LorryResponseDto> dtoPage =
-                page.map(LorryMapper::toDto);
+                result.map(LorryMapper::toDto);
 
         return ResponseEntity.ok(dtoPage);
     }

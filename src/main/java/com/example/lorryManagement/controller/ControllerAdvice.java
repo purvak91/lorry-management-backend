@@ -1,5 +1,6 @@
 package com.example.lorryManagement.controller;
 
+import com.example.lorryManagement.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -107,6 +108,21 @@ public class ControllerAdvice {
         );
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> handleBadRequest(
+            BadRequestException ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity.status(400).body(
+                errorBody(
+                        400,
+                        "Bad Request",
+                        ex.getMessage(),
+                        request
+                )
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleUnhandledException(
             Exception e,
@@ -135,7 +151,7 @@ public class ControllerAdvice {
         body.put("status", status);
         body.put("error", error);
         body.put("message", message);
-        body.put("path", request.getRequestURI());
+        body.put("path", request != null ? request.getRequestURI() : null);
         return body;
     }
 
