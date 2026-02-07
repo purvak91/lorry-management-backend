@@ -1,5 +1,6 @@
 server:
   port: ${PORT:1001}
+  shutdown: graceful
 
 spring:
   datasource:
@@ -8,11 +9,31 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
 
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
 
   flyway:
-    repair-on-migrate: true
     enabled: true
+    validate-on-migrate: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.boot.autoconfigure: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never

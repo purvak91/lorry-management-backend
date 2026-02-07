@@ -1,17 +1,28 @@
-FROM eclipse-temurin:17-jdk AS build
+# ---------- Build stage ----------
+FROM gradle:8.10.2-jdk21 AS builder
 WORKDIR /app
 
-COPY . .
+# Copy only what is needed for dependency resolution first
+COPY build.gradle settings.gradle gradlew gradlew.bat ./
+COPY gradle gradle
 
-RUN chmod +x ./gradlew
+RUN ./gradlew dependencies --no-daemon
 
-RUN ./gradlew clean bootJar -x test
+# Now copy source
+COPY src src
 
-FROM eclipse-temurin:17-jre AS run
+# Build the application
+RUN ./gradlew bootJar --no-daemon
+
+# ---------- Runtime stage ----------
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /app/build/libs/lorry-management-0.0.1-SNAPSHOT.jar app.jar
+# Copy only the built jar
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-EXPOSE 8080
+# Expose backend port
+EXPOSE 1001
 
+# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
